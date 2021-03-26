@@ -1,13 +1,17 @@
-package com.nallani.login.registration.service;
+package com.nallani.login.registration.service.impl;
 
 import com.nallani.login.registration.model.*;
 import com.nallani.login.registration.repository.UserRepository;
+import com.nallani.login.registration.service.*;
+import com.nallani.login.registration.util.RegExConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
@@ -21,13 +25,14 @@ public class LoginServiceImpl implements LoginService {
     private UserRepository userRepository;
 
     @Autowired
-    private OtpService otpService;
+    private OtpServiceImpl otpServiceImpl;
 
     @Autowired
-    private MyEmailService emailService;
+    private MyEmailServiceImpl emailService;
 
     @Autowired
     public SimpleMailMessage template;
+    private String info;
 
     @Override
     public LoginResult register(CreateUserRequest userRequest) {
@@ -48,7 +53,7 @@ public class LoginServiceImpl implements LoginService {
         address.setState(userRequest.getAddress().getState());
         address.setPostalCode(userRequest.getAddress().getPostalCode());
 
-        userData.setUserId(UUID.randomUUID());
+        userData.setUserId(String.valueOf(UUID.randomUUID()));
         userData.setUsername(userRequest.getUsername());
         userData.setPassword(userRequest.getPassword());
         userData.setDateOfBirth(userRequest.getDateOfBirth());
@@ -120,7 +125,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Otp generateOtp(String userName) {
-        String generateOTP = otpService.generateOTP(userName);
+        String generateOTP = otpServiceImpl.generateOTP(userName);
         log.info("OTP : " + generateOTP);
         String text = String.format(template.getText(), generateOTP);
         emailService.sendSimpleMessage("nallanisrikanth99@gmail.com", "Your Account: "+generateOTP+" is your verification code for secure access", text);
@@ -133,9 +138,9 @@ public class LoginServiceImpl implements LoginService {
     public LoginResult validateOtp(Otp otp) {
         LoginResult toReturn = new LoginResult();
         if (otp != null) {
-            String serverOtp = otpService.getOtp(otp.getUsername());
+            String serverOtp = otpServiceImpl.getOtp(otp.getUsername());
             if (serverOtp != null && serverOtp.equals(otp.getCode())) {
-                otpService.clearOTP(otp.getUsername());
+                otpServiceImpl.clearOTP(otp.getUsername());
                 log.info("Entered Otp is valid");
                 toReturn.setResultType(true);
                 return toReturn;
@@ -152,10 +157,46 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public String validateTransferIdToken(String key, String transferId) {
 
-        String serverToken = TokenGenerationService.getTransferIdToken(key);
+        String serverToken = TokenGenerationServiceImpl.getTransferIdToken(key);
         if (serverToken != null && serverToken.equals(transferId)) {
             return "Success";
         }
         return "Failed";
     }
+
+    @Override
+    @Transactional
+    public void deleteUser(String info) throws Exception {
+
+        if(info.matches(RegExConstants.USER_NAME_THREE)){
+            userRepository.deleteUserByUsername(info);
+            log.info("deleted user by Username {}", info);
+
+        }else if (info.matches(RegExConstants.DATE_OF_BIRTH)){
+            userRepository.deleteUserByDateOfBirth(info);
+            log.info("deleted user by DateOfBirth{}", info);
+
+        }else if (info.matches(RegExConstants.UUID)){
+            userRepository.deleteUserByUserId(info);
+            log.info("deleted user by userId{}", info);
+
+        }else if (info.matches(RegExConstants.EMAIL)){
+            userRepository.deleteUserByEmail(info);
+            log.info("deleted user by email{}", info);
+
+        }else if (info.matches(RegExConstants.PHONE)){
+            userRepository.deleteUserByPhone(info);
+            log.info("deleted user by phone{}", info);
+
+        }else {
+            throw new Exception("Not able to delete User");
+        }
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+
 }

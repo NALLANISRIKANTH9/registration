@@ -1,4 +1,4 @@
-package com.nallani.login.registration.service;
+package com.nallani.login.registration.service.impl;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -9,12 +9,12 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class OtpService {
+public class OtpServiceImpl {
 
     private static final Integer EXPIRE_MINS = 15;
     private LoadingCache<String, String> otpCacheService;
 
-    public OtpService() {
+    public OtpServiceImpl() {
         super();
         otpCacheService = CacheBuilder.newBuilder().
                 expireAfterWrite(EXPIRE_MINS, TimeUnit.MINUTES).build(new CacheLoader<String, String>() {

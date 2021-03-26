@@ -1,5 +1,6 @@
 package com.nallani.login.registration.service;
 
+import com.nallani.login.registration.service.impl.JwtServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -21,7 +22,7 @@ public class createJWTTokenTest {
         String jwtSubject = "Sri";
         int jwtTimeToLive = 800;
 
-        String jwt = Jwt.createJWT(
+        String jwt = JwtServiceImpl.createJWT(
                 jwtId, // claim = jti
                 jwtIssuer, // claim = iss
                 jwtSubject, // claim = sub
@@ -30,7 +31,7 @@ public class createJWTTokenTest {
 
         logger.info("jwt = \"" + jwt.toString() + "\"");
 
-        Claims claims = Jwt.decodeJWT(jwt);
+        Claims claims = JwtServiceImpl.decodeJWT(jwt);
 
         logger.info("claims = " + claims.toString());
 
@@ -49,7 +50,7 @@ public class createJWTTokenTest {
         String notAJwt = "This is not a JWT";
 
         // This will fail with expected exception listed above
-        Claims claims = Jwt.decodeJWT(notAJwt);
+        Claims claims = JwtServiceImpl.decodeJWT(notAJwt);
 
     }
 
@@ -64,7 +65,7 @@ public class createJWTTokenTest {
         String jwtSubject = "Andrew";
         int jwtTimeToLive = 800000;
 
-        String jwt = Jwt.createJWT(
+        String jwt = JwtServiceImpl.createJWT(
                 jwtId, // claim = jti
                 jwtIssuer, // claim = iss
                 jwtSubject, // claim = sub
@@ -84,7 +85,7 @@ public class createJWTTokenTest {
 
         // this will fail with a SignatureException
 
-        Jwt.decodeJWT(tamperedJwt.toString());
+        JwtServiceImpl.decodeJWT(tamperedJwt.toString());
 
     }
 }

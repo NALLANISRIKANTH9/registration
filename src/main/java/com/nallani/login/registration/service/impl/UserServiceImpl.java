@@ -1,7 +1,8 @@
-package com.nallani.login.registration.service;
+package com.nallani.login.registration.service.impl;
 
 import com.nallani.login.registration.model.User;
 import com.nallani.login.registration.repository.UserRepository;
+import com.nallani.login.registration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

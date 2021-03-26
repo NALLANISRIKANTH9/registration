@@ -1,9 +1,8 @@
 package com.nallani.login.registration.service;
 
-import com.nallani.login.registration.model.CreateUserRequest;
-import com.nallani.login.registration.model.Login;
-import com.nallani.login.registration.model.LoginResult;
-import com.nallani.login.registration.model.Otp;
+import com.nallani.login.registration.model.*;
+
+import java.util.List;
 
 public interface LoginService {
 
@@ -20,4 +19,8 @@ public interface LoginService {
     LoginResult validateOtp(Otp otp);
 
     String validateTransferIdToken(String key, String transferId);
+
+    void deleteUser(String info) throws Exception;
+
+    List<User> findAll();
 }

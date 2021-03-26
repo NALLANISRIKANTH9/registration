@@ -1,4 +1,4 @@
-package com.nallani.login.registration.service;
+package com.nallani.login.registration.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ import java.util.Properties;
 
 @Service
 @Configuration
-public class MyEmailService  {
+public class MyEmailServiceImpl {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

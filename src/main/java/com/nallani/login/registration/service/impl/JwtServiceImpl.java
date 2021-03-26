@@ -1,4 +1,4 @@
-package com.nallani.login.registration.service;
+package com.nallani.login.registration.service.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -20,7 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
 
-public class Jwt {
+public class JwtServiceImpl {
 
     // The secret key.
     private static String SECRET_KEY = "secret-key";

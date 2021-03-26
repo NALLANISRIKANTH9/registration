@@ -1,14 +1,13 @@
 package com.nallani.login.registration.model;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @Entity
 @Table(name = "usertable")
 public class User {
 
     @Column(nullable = false)
-    private UUID userId;
+    private String userId;
 
     @Id
     @Column(nullable = false)
@@ -39,13 +38,9 @@ public class User {
         this.phone = phone;
     }
 
-    public UUID getUserId() {
-        return userId;
-    }
+    public String getUserId() { return userId; }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
+    public void setUserId(String userId) { this.userId = userId; }
 
     public String getUsername() {
         return username;

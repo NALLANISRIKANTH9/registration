@@ -1,15 +1,13 @@
 package com.nallani.login.registration.rest;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.nallani.login.registration.model.CreateUserRequest;
-import com.nallani.login.registration.model.Login;
-import com.nallani.login.registration.model.LoginResult;
-import com.nallani.login.registration.model.Otp;
+import com.nallani.login.registration.model.*;
 import com.nallani.login.registration.service.*;
+import com.nallani.login.registration.service.impl.JwtServiceImpl;
+import com.nallani.login.registration.service.impl.OtpServiceImpl;
+import com.nallani.login.registration.service.impl.TokenGenerationServiceImpl;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.hibernate.id.UUIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.List;
 import java.util.Random;
 
 import static com.nallani.login.registration.util.SessionTokens.*;
@@ -31,7 +30,7 @@ public class RestResource {
     @Autowired
     private LoginService loginService;
     @Autowired
-    private OtpService otpService;
+    private OtpServiceImpl otpServiceImpl;
 
     @PostMapping("/registration")
     @ApiOperation(value = "Initiate (create) a user.", response = LoginResult.class)
@@ -49,7 +48,7 @@ public class RestResource {
         random.nextInt();
         //ClientRequestInfo headerInfo = buildClientRequestInfo(servletRequest);
         //headerInfo.getSessionToken().setToken(null);
-        servletResponse.addHeader("JWT", Jwt.createJWT(random.toString(), "Sri", "Nallani.com", 60));
+        servletResponse.addHeader("JWT", JwtServiceImpl.createJWT(random.toString(), "Sri", "Nallani.com", 60));
         servletResponse.setStatus(HttpServletResponse.SC_CREATED);
         return loginService.register(userRequest);
     }
@@ -68,7 +67,7 @@ public class RestResource {
         log.info("login request for user {}", loginData.getUsername());
         ClientRequestInfo headerInfo = buildClientRequestInfo(servletRequest);
 
-        Cookie cookie = new Cookie("transfer-id", TokenGenerationService.generateTransferIdToken(loginData.getUsername()));
+        Cookie cookie = new Cookie("transfer-id", TokenGenerationServiceImpl.generateTransferIdToken(loginData.getUsername()));
         cookie.setMaxAge(7 * 24 * 60 * 60); // expires in 7 days
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
@@ -136,6 +135,27 @@ public class RestResource {
         return loginService.validateOtp(otp);
 
     }
+
+    @GetMapping("/deleteUser/{info}")
+    @ApiOperation(value = "delete user for given info like userId, username, dob, email, phone.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "x-useragent", value = "user's agent name", dataType = "string", paramType = "header", required = true),
+            @ApiImplicitParam(name = "x-ipaddress", value = "user's IP", dataType = "string", paramType = "header", required = true),
+            @ApiImplicitParam(name = "x-application-context", value = "application name", dataType = "string", paramType = "header", required = true),
+            @ApiImplicitParam(name = "x-device-token", value = "user's device token", dataType = "string", paramType = "header", required = true)
+    })
+    public void deleteUser(@PathVariable("info") String info) throws Exception {
+        log.info("processing deleteUser for given information {}", info);
+
+        loginService.deleteUser(info);
+
+    }
+    @GetMapping("/findAll")
+    public List<User> findAllUsers() {
+        log.info("findAllUsers method called successfully");
+        return loginService.findAll();
+    }
+
 
     @GetMapping("/health")
     public String healthCheck() {
