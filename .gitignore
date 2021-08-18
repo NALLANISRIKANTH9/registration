@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+/.gradle
+/build/
+.idea/
+__pycache__/
+/out/
+/target/
+/.mvn/
+/.idea/
